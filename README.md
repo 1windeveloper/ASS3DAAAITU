@@ -20,28 +20,32 @@ We want to see which algorithm fits different types of transport networks and wh
 - **Kruskal.** Sorts all edges by weight and connects components with Union-Find, avoiding cycles.  
   *Key data structure:* Disjoint Set Union (Union-Find).  *Time:* `O(E log E)` ≈ `O(E log V)`.
 
-![Algorithm overview](docs/img/alg_overview_table.png)
+<img width="1474" height="369" alt="Снимок экрана 2025-10-26 в 23 34 01" src="https://github.com/user-attachments/assets/22d78d52-89c2-4c93-a466-d2f9876d532f" />
+
 
 ## Experimental Data
 Two graphs from `ass_3_input.json`:
 - **Graph 1:** 5 vertices, 7 edges — medium-density, moderately connected city area.  
 - **Graph 2:** 4 vertices, 5 edges — low-density, smaller and simpler network.
+- 
+<img width="1474" height="369" alt="Снимок экрана 2025-10-26 в 23 34 37" src="https://github.com/user-attachments/assets/dd22caab-a5eb-4c7a-b3fa-4229480eb17f" />
 
-![Experimental data](docs/img/experimental_data_table.png)
 
 ## Results
 Both algorithms return the same MST total cost on both graphs, which validates the implementations.
 
 - **Graph 1:** Prim → cost 16, time ~13.20 ms, ops 29; Kruskal → cost 16, time ~22.45 ms, ops 32  
 - **Graph 2:** Prim → cost 6, time ~0.04 ms, ops 19; Kruskal → cost 6, time ~0.09 ms, ops 22
+- 
+<img width="1474" height="369" alt="Снимок экрана 2025-10-26 в 23 34 55" src="https://github.com/user-attachments/assets/1a9995a7-12a7-4e18-b56c-c5549fd81f3e" />
 
-![Numerical results](docs/img/results_table.png)
 
 ### MST snapshot (Graph 1)
 Selected edges: **B—C (2), A—C (3), B—D (5), D—E (6)**.  
 Total cost: **16**.
 
-![MST of Graph 1](docs/img/mst_graph1.png)
+<img width="1474" height="528" alt="Снимок экрана 2025-10-26 в 23 35 20" src="https://github.com/user-attachments/assets/6ea7422f-4644-4643-b70c-ffa97a4def27" />
+
 
 ## Discussion
 - **Time efficiency.** Prim often benefits on medium/denser graphs because only the local frontier in the heap is touched; Kruskal pays a fixed sorting cost on all edges. On very large **sparse** graphs (E ≈ V) the gap shrinks and the choice can depend on coding convenience.
@@ -52,3 +56,4 @@ Total cost: **16**.
 1) Both methods give the same minimal total cost — experiment agrees with theory.  
 2) On medium-density data **Prim** was faster; on a small sparse graph the difference is tiny, with Kruskal slightly behind because of sorting.  
 3) Rule of thumb: dense/medium graphs → **Prim**; very sparse or very large graphs → **Kruskal** is competitive and convenient when edges arrive as one flat list.
+
