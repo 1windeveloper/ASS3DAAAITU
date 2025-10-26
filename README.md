@@ -1,111 +1,54 @@
-1. Introduction
+# Introduction
+Designing a cheap-but-connected road network can be modeled as the **Minimum Spanning Tree (MST)** problem on a weighted, undirected graph: districts are vertices and candidate roads are edges whose weights are construction costs. This report compares two greedy methods — **Prim’s** and **Kruskal’s** — focusing on correctness and speed on graphs with different densities.
 
-Efficient urban transportation planning requires minimizing the total cost of connecting all districts while maintaining full accessibility. This problem is represented mathematically as finding a Minimum Spanning Tree (MST) in a weighted undirected graph. Each vertex represents a district, and each edge represents a possible road with a construction cost as its weight.
-This assignment applies Prim’s and Kruskal’s algorithms to identify the MST, compare their computational performance, and analyze their efficiency depending on graph characteristics such as density and size.
+## Aim & Scope
+**Goal.** Build a small Java tool that:
+- reads a city graph from **JSON**;
+- computes an MST with **Prim** and with **Kruskal**;
+- records **performance metrics** (runtime in ms and counts of key operations);
+- writes a compact **JSON summary** (MST edges, total cost, short comparison).
 
-2. Purpose of the Work
+We want to see which algorithm fits different types of transport networks and what trade-offs appear between speed and implementation effort.
 
-The primary goal of this project is to develop a Java-based application that:
+## Methodology
+**Tools.** Java 25; Gson for JSON; IntelliJ IDEA; metrics: runtime (ms) and operation counters.  
+**Data format.** Input contains a list of vertices (districts) and a list of edges objects `{from, to, weight}`.
 
-Reads graph data from a JSON input file representing city districts and potential road connections.
+## Algorithm Overview
+- **Prim.** Grows the tree vertex-by-vertex by always picking the cheapest edge to any unvisited vertex.  
+  *Key data structure:* priority queue (min-heap).  *Time:* `O(E log V)`.
+- **Kruskal.** Sorts all edges by weight and connects components with Union-Find, avoiding cycles.  
+  *Key data structure:* Disjoint Set Union (Union-Find).  *Time:* `O(E log E)` ≈ `O(E log V)`.
 
-Applies Prim’s and Kruskal’s algorithms to construct the MST.
+![Algorithm overview](docs/img/alg_overview_table.png)
 
-Records performance metrics, including execution time and operation counts.
+## Experimental Data
+Two graphs from `ass_3_input.json`:
+- **Graph 1:** 5 vertices, 7 edges — medium-density, moderately connected city area.  
+- **Graph 2:** 4 vertices, 5 edges — low-density, smaller and simpler network.
 
-Produces a JSON output file summarizing the MST edges, total cost, and algorithmic efficiency.
-The ultimate objective is to determine the optimal algorithm for various types of transportation networks and understand trade-offs between computation time and implementation complexity.
+![Experimental data](docs/img/experimental_data_table.png)
 
-3. Implementation and Methodology
-3.1 Tools and Technologies
+## Results
+Both algorithms return the same MST total cost on both graphs, which validates the implementations.
 
-Language: Java 25
+- **Graph 1:** Prim → cost 16, time ~13.20 ms, ops 29; Kruskal → cost 16, time ~22.45 ms, ops 32  
+- **Graph 2:** Prim → cost 6, time ~0.04 ms, ops 19; Kruskal → cost 6, time ~0.09 ms, ops 22
 
-Library: Gson (for JSON parsing and writing)
+![Numerical results](docs/img/results_table.png)
 
-Data Format: JSON input/output
+### MST snapshot (Graph 1)
+Selected edges: **B—C (2), A—C (3), B—D (5), D—E (6)**.  
+Total cost: **16**.
 
-IDE: IntelliJ IDEA
+![MST of Graph 1](docs/img/mst_graph1.png)
 
-Performance Metrics: execution time (ms), operation counts
+## Discussion
+- **Time efficiency.** Prim often benefits on medium/denser graphs because only the local frontier in the heap is touched; Kruskal pays a fixed sorting cost on all edges. On very large **sparse** graphs (E ≈ V) the gap shrinks and the choice can depend on coding convenience.
+- **Work profile.** Prim’s cost scales with vertex degrees (how many incident edges are relaxed); Kruskal’s cost is dominated by sorting and `find/union` calls.
+- **Implementation effort.** Kruskal needs a careful Union-Find (path compression + union by rank/size). Prim is straightforward with adjacency lists and a min-heap.
 
-3.2 Data Structure
-
-Each input graph includes:
-
-A list of nodes (districts)
-
-A list of edges (possible roads), where each edge has attributes from, to, and weight.
-
-3.3 Algorithms Overview
-<img width="955" height="534" alt="image" src="https://github.com/user-attachments/assets/61ddcbf9-c9ad-4e88-9af9-6aa9f2eb11ea" />
-
-4. Experimental Data
-
-Two graphs were used from the provided ass_3_input.json file:
-
-<img width="1175" height="290" alt="image" src="https://github.com/user-attachments/assets/ab97e0ee-37b6-4b4e-823d-0e82a6444e53" />
-
-
-5. Results and Observations
-5.1 Numerical Results
-<img width="1176" height="454" alt="image" src="https://github.com/user-attachments/assets/e00b50bf-6c95-4704-a44d-6eabe54ac5a5" />
-
-
-
-
-Both algorithms produce identical MST costs for both graphs.
-Differences in time and operations are expected due to algorithmic complexity and JVM execution behavior.
-
-5.2 Visual Analysis
-Analysis:
-
-On the larger, denser Graph 1, Prim runs faster (13.2 ms vs 22.45 ms).
-
-On the smaller Graph 2, both are nearly instantaneous, with Kruskal slightly slower due to sorting overhead.
-Interpretation:
-
-Prim requires fewer operations on the denser graph (Graph 1) due to efficient heap-based selection.
-
-Kruskal performs slightly more operations as it must compare and union edges, even for smaller graphs.
-Figure 3 – MST Edge Visualization
-
-For Graph 1 (5 vertices), both algorithms selected identical MST edges:
-
-B — C (2)
-A — C (3)
-B — D (5)
-D — E (6)
-
-
-Total Cost = 16
-
-6. Analytical Discussion
-6.1 Performance Interpretation
-
-Time Efficiency:
-Kruskal is slightly faster in Graph 1 due to fewer heap operations. However, Prim’s advantage grows in denser graphs.
-
-Operation Complexity:
-Prim’s algorithm depends heavily on the number of adjacent vertices; Kruskal depends primarily on the number of edges.
-
-Scalability:
-For very large and sparse graphs, Kruskal is preferred. For dense graphs where adjacency lists are easy to maintain, Prim’s algorithm is more efficient.
-
-Implementation Complexity:
-Kruskal’s implementation requires additional data structure (Union-Find), while Prim’s algorithm is simpler to implement when adjacency lists are available.
-
-7. Conclusion
-
-This project successfully optimized a city’s road network using MST algorithms.
-Both Prim’s and Kruskal’s algorithms produced identical minimal costs, validating correctness and theoretical equivalence.
-
-Kruskal’s Algorithm proved efficient for sparse networks (fewer roads per district).
-
-Prim’s Algorithm performed slightly better on dense networks (many potential connections).
-
-The analysis confirms that choosing the right algorithm depends on the graph’s density and implementation constraints.
-Overall, this work demonstrates a practical application of greedy graph algorithms for cost optimization in real-world infrastructure planning.
-
----
-updated: 2025-10-26 23:22:16
+## Conclusions
+1) Both methods give the same minimal total cost — experiment agrees with theory.  
+2) On medium-density data **Prim** was faster; on a small sparse graph the difference is tiny, with Kruskal slightly behind because of sorting.  
+3) Rule of thumb: dense/medium graphs → **Prim**; very sparse or very large graphs → **Kruskal** is competitive and convenient when edges arrive as one flat list.
